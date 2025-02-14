@@ -17,6 +17,8 @@ public class Ventana extends JFrame{
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		this.setResizable(true);
+		
+		//mínimo y máximo tamaño de la ventana
 		this.setMaximumSize(new Dimension(800,800));
 		this.setMinimumSize(new Dimension(400,400));
 	}
