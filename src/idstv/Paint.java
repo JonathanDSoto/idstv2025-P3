@@ -4,6 +4,8 @@ import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -31,7 +33,12 @@ public class Paint implements MouseListener, MouseMotionListener{
      // Para almacenar los puntos dibujados
 	private List<Point> points = new ArrayList<>();
 	
+	private List<Rectangle> figuras = new ArrayList<>();
+	
     List<List<Point>> listaDePuntos = new ArrayList<>();
+    
+    //1 = pincel, 2 = cuadrado
+    private int method = 1;
     
 	/**
 	 * Launch the application.
@@ -78,6 +85,13 @@ public class Paint implements MouseListener, MouseMotionListener{
 		panel_1.setLayout(new BorderLayout(0, 0));
 		
 		JButton btnNewButton = new JButton("Pincel");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				method = 1;
+				
+			}
+		});
 		panel_1.add(btnNewButton, BorderLayout.NORTH);
 		
 		JPanel panel_3 = new JPanel();
@@ -85,6 +99,19 @@ public class Paint implements MouseListener, MouseMotionListener{
 		
 		JButton btnNewButton_1 = new JButton("Borrar");
 		panel_3.add(btnNewButton_1);
+		
+		JButton btnNewButton_2 = new JButton("Rectangulo");
+		btnNewButton_2.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				
+				method = 2;
+			}
+			
+		});
+		panel_3.add(btnNewButton_2);
 		
 		JPanel panel_4 = new JPanel();
 		panel_1.add(panel_4, BorderLayout.SOUTH);
@@ -105,7 +132,15 @@ public class Paint implements MouseListener, MouseMotionListener{
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub 
+		// TODO Auto-generated method stub
+		
+		if(method==2) {
+			Rectangle tmp = new Rectangle(e.getX(),e.getY(),100,100);
+			figuras.add(tmp);
+		}
+		
+		
+		drawingPanel.repaint();
 	}
 
 	@Override
@@ -144,7 +179,8 @@ public class Paint implements MouseListener, MouseMotionListener{
 		// TODO Auto-generated method stub
 		 Point newPoint = e.getPoint(); 
 		 
-		 points.add(newPoint);  
+		 if(method==1)
+			 points.add(newPoint);  
 	        
 	     drawingPanel.repaint();
 	        
@@ -186,7 +222,27 @@ public class Paint implements MouseListener, MouseMotionListener{
 	                g2d.drawLine(p1.x, p1.y, p2.x, p2.y);
 	            }
 	        }
+	        
+	        for (Iterator iterator = figuras.iterator(); iterator.hasNext();) {
+				Rectangle rectangle = (Rectangle) iterator.next();
+				
+				g2d.drawRect(rectangle.x, rectangle.y, rectangle.w, rectangle.h);
+				
+			}
 	    }
+	}
+	
+	class Rectangle{
+		
+		private int x,y,w,h;
+		
+		public Rectangle(int x, int y,int w, int h)
+		{
+			this.x = x;
+			this.y = y;
+			this.w = w;
+			this.h = h;
+		}
 	}
 
 	@Override
