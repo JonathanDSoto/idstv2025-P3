@@ -23,6 +23,7 @@ import java.awt.Dimension;
 
 import javax.swing.JLabel;
 import javax.swing.JButton;
+import java.awt.GridLayout;
 
 public class Paint implements MouseListener, MouseMotionListener{
 
@@ -31,14 +32,15 @@ public class Paint implements MouseListener, MouseMotionListener{
 	
 	private Point lastPoint; // Para almacenar la última posición del mouse
      // Para almacenar los puntos dibujados
-	private List<Point> points = new ArrayList<>();
+	private List<MyPoint> points = new ArrayList<>();
 	
 	private List<Rectangle> figuras = new ArrayList<>();
 	
-    List<List<Point>> listaDePuntos = new ArrayList<>();
+    List<List<MyPoint>> listaDePuntos = new ArrayList<>();
     
     //1 = pincel, 2 = cuadrado
-    private int method = 1;
+    private int method = 1, grosor = 2;
+    private Color color = Color.black;
     
 	/**
 	 * Launch the application.
@@ -96,8 +98,17 @@ public class Paint implements MouseListener, MouseMotionListener{
 		
 		JPanel panel_3 = new JPanel();
 		panel_1.add(panel_3, BorderLayout.CENTER);
+		panel_3.setLayout(new GridLayout(10, 2, 0, 0));
 		
 		JButton btnNewButton_1 = new JButton("Borrar");
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				points.clear();
+				figuras.clear();
+				listaDePuntos.clear();
+				drawingPanel.repaint();
+			}
+		});
 		panel_3.add(btnNewButton_1);
 		
 		JButton btnNewButton_2 = new JButton("Rectangulo");
@@ -112,6 +123,45 @@ public class Paint implements MouseListener, MouseMotionListener{
 			
 		});
 		panel_3.add(btnNewButton_2);
+		
+		JButton btnNewButton_3 = new JButton("-");
+		panel_3.add(btnNewButton_3);
+		
+		JLabel lblNewLabel = new JLabel("1");
+		lblNewLabel.setHorizontalAlignment(JLabel.CENTER);
+		panel_3.add(lblNewLabel);
+		
+		JButton btnNewButton_4 = new JButton("+");
+		btnNewButton_4.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				grosor+=1;
+				
+				lblNewLabel.setText(grosor+"");
+			}
+		});
+		panel_3.add(btnNewButton_4);
+		
+		JButton btnNewButton_5 = new JButton("Rojo");
+		btnNewButton_5.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				color = Color.red;
+			}
+		});
+		btnNewButton_5.setBackground(new Color(255, 11, 0));
+		btnNewButton_5.setOpaque(true);
+		panel_3.add(btnNewButton_5);
+		
+		JButton btnNewButton_6 = new JButton("Verde");
+		btnNewButton_6.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				color = Color.green;
+			}
+		});
+		btnNewButton_6.setBackground(new Color(2, 234, 0));
+		btnNewButton_6.setOpaque(true);
+		panel_3.add(btnNewButton_6);
 		
 		JPanel panel_4 = new JPanel();
 		panel_1.add(panel_4, BorderLayout.SOUTH);
@@ -147,7 +197,10 @@ public class Paint implements MouseListener, MouseMotionListener{
 	public void mousePressed(MouseEvent e) {
 		// TODO Auto-generated method stub 
 		lastPoint = e.getPoint();
-        points.add(lastPoint); // Añadir el primer punto
+		
+		MyPoint p = new MyPoint(lastPoint,color,grosor);
+		
+        points.add(p); // Añadir el primer punto
          
 	}
 
@@ -156,7 +209,7 @@ public class Paint implements MouseListener, MouseMotionListener{
 		// TODO Auto-generated method stub 
 		
 		
-		ArrayList<Point> listaCopiada = (ArrayList<Point>) (((ArrayList<Point>) points).clone());
+		ArrayList<MyPoint> listaCopiada = (ArrayList<MyPoint>) (((ArrayList<MyPoint>) points).clone());
 		
 		listaDePuntos.add(listaCopiada); 
 		points.clear();
@@ -180,7 +233,7 @@ public class Paint implements MouseListener, MouseMotionListener{
 		 Point newPoint = e.getPoint(); 
 		 
 		 if(method==1)
-			 points.add(newPoint);  
+			 points.add(new MyPoint(newPoint,color,grosor));  
 	        
 	     drawingPanel.repaint();
 	        
@@ -204,12 +257,17 @@ public class Paint implements MouseListener, MouseMotionListener{
 	        g2d.setStroke(new BasicStroke(3));
 	        
 	        // Dibujar todos los trazos guardados (listaDePuntos)
-	        for (List<Point> trazo : listaDePuntos) {
+	        for (List<MyPoint> trazo : listaDePuntos) {
 	            if (trazo.size() > 1) {
-	                for (int i = 1; i < trazo.size(); i++) {
-	                    Point p1 = trazo.get(i - 1);
-	                    Point p2 = trazo.get(i);
-	                    g2d.drawLine(p1.x, p1.y, p2.x, p2.y);
+	                for (int i = 1; i < trazo.size(); i++) { 
+	                	
+	                	MyPoint p1 = trazo.get(i - 1);
+	                	MyPoint p2 = trazo.get(i);
+	                	
+	                	g2d.setColor(p1.c);
+	                	g2d.setStroke(new BasicStroke(p1.g));
+	                	
+	                    g2d.drawLine(p1.p.x, p1.p.y, p2.p.x, p2.p.y);
 	                }
 	            }
 	        }
@@ -217,9 +275,15 @@ public class Paint implements MouseListener, MouseMotionListener{
 	        // Dibujar el trazo actual (points) mientras se arrastra el mouse
 	        if (points.size() > 1) {
 	            for (int i = 1; i < points.size(); i++) {
-	                Point p1 = points.get(i - 1);
-	                Point p2 = points.get(i);
-	                g2d.drawLine(p1.x, p1.y, p2.x, p2.y);
+	            	
+	            	g2d.setColor(points.get(i).c ); 
+	            	
+	                MyPoint p1 = points.get(i - 1);
+	                MyPoint p2 = points.get(i);
+	                
+	                g2d.setStroke(new BasicStroke(p1.g));
+	                
+	                g2d.drawLine(p1.p.x, p1.p.y, p2.p.x, p2.p.y);
 	            }
 	        }
 	        
@@ -230,6 +294,20 @@ public class Paint implements MouseListener, MouseMotionListener{
 				
 			}
 	    }
+	}
+	
+	class MyPoint extends Point{
+		
+		private Point p;
+		private Color c;
+		private int g;
+		
+		public MyPoint(Point p,Color c, int g)
+		{
+			this.p = p;
+			this.c = c;
+			this.g = g;
+		}
 	}
 	
 	class Rectangle{
