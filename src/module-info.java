@@ -4,6 +4,5 @@
 /**
  * 
  */
-module IDSTV {
-	requires java.desktop;
+module MVCTV {
 }
