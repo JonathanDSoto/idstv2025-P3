@@ -112,14 +112,11 @@ public class AuthView {
 				
 				if(flag1 && flag2) {
 					
-					if(textField.getText().equals("fake@mail.com") ) {
-						if(passText.equals("12345")) {
-							
-							JOptionPane.showMessageDialog(null, "Bienvenido.");
-							
-						}else {
-							JOptionPane.showMessageDialog(null, "Error al acceder","verifique su información",JOptionPane.WARNING_MESSAGE);
-						}
+					AuthModel am = new AuthModel();
+					boolean is_login = am.login(textField.getText(), passText);
+					
+					if(is_login) {
+						JOptionPane.showMessageDialog(null, "Bienvenido.");
 					}else {
 						JOptionPane.showMessageDialog(null, "Error al acceder","verifique su información",JOptionPane.WARNING_MESSAGE);
 					}
