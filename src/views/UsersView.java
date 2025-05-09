@@ -12,7 +12,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import controllers.UsersController;
 import models.User;
+import models.UsersModel;
 
 public class UsersView {
 
@@ -55,6 +57,25 @@ public class UsersView {
 			user.setBounds(50, x, 210, 26);
 			user.setHorizontalAlignment(JLabel.CENTER);
 			panel.add(user);
+			
+			JButton delete = new JButton("Eliminar");
+			delete.setBounds(250,x, 200,40);
+			delete.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					UsersModel um = new UsersModel();
+					um.remove(0);
+					
+					ventana.dispose();
+					
+					UsersController us = new UsersController();
+					us.index();
+				}
+				
+			});
+			panel.add(delete);
 			
 			x+= 35;
 			
